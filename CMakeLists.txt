@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME} ${FILES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
 
 if(MSVC)
-    set(DEFAULT_CXX_FLAGS "/DWIN32 /D_WINDOWS /D_MSBC /W4 /WX- /nologo /fp:precise /arch:AVX2 /Zc:wchar_t /TP /Gd")
+    set(DEFAULT_CXX_FLAGS "/DWIN32 /D_WINDOWS /D_MSBC /W4 /WX- /nologo /fp:precise /arch:AVX2 /Zc:wchar_t /TP /Gd /utf-8")
     if("1800" VERSION_LESS MSVC_VERSION)
         set(DEFAULT_CXX_FLAGS "${DEFAULT_CXX_FLAGS} /EHsc")
     endif()

@@ -1,4 +1,4 @@
-﻿#include "unicode.h"
+#include "unicode.h"
 #include <cassert>
 #include <iostream>
 
@@ -74,7 +74,8 @@ void test_surrogate_pairs() {
 void test_malformed_sequences() {
     // Test invalid UTF-16 (unpaired surrogates)
     // A high surrogate without a following low surrogate
-    std::u16string unpaired_high_surrogate = u"A\xD834B"; // High surrogate U+D834 alone
+    char16_t high_surrogate[] = {static_cast<char16_t>(0xD834), 0};
+    std::u16string unpaired_high_surrogate = high_surrogate; // u"A\xD834B"; // High surrogate U+D834 alone
     std::u8string utf8_from_unpaired_high = utf16_to_utf8(unpaired_high_surrogate);
     // Common behavior is to replace with U+FFFD (EF BF BD in UTF-8)
     std::u8string expected_utf8_high = u8"A\xEF\xBF\xBDB";
@@ -85,7 +86,8 @@ void test_malformed_sequences() {
     }
 
     // A low surrogate without a preceding high surrogate
-    std::u16string unpaired_low_surrogate = u"A\xDD1EB"; // Low surrogate U+DD1E alone
+    char16_t low_surrogate[] = {static_cast<char16_t>(0xDD1E), 0};
+    std::u16string unpaired_low_surrogate = low_surrogate;//u "A\xDD1EB"; // Low surrogate U+DD1E alone
     std::u8string utf8_from_unpaired_low = utf16_to_utf8(unpaired_low_surrogate);
     std::u8string expected_utf8_low = u8"A\xEF\xBF\xBDB";
     if (utf8_from_unpaired_low == expected_utf8_low) {
@@ -113,6 +115,8 @@ int main(void)
     test_emoji();
     test_empty();
     test_roundtrip();
+    test_surrogate_pairs();
+    test_malformed_sequences();
 
     std::cout << "All tests passed!" << std::endl;
 
