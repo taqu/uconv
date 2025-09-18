@@ -1,8 +1,8 @@
-#include "unicode.h"
+#include "uconv.h"
 #include <cassert>
 #include <iostream>
 
-#pragma warning(disable: 7744)
+using namespace uconv;
 
 void test_ascii() {
     std::u8string utf8_ascii = u8"Hello, World!";

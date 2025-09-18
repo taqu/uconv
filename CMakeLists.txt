@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.50)
+cmake_minimum_required(VERSION 3.28)
 
 function(copy_dlls TARGET_NAME)
     add_custom_command (
@@ -10,7 +10,7 @@ endfunction()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug" "Release")
 
-set(PROJECT_NAME unicode)
+set(PROJECT_NAME uconv)
 project(${PROJECT_NAME})
 
 set(HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -19,9 +19,9 @@ set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 ########################################################################
 # Sources
 set(HEADERS
-    "${HEADER_ROOT}/unicode.h")
+    "${HEADER_ROOT}/uconv.h")
 set(SOURCES
-    "${SOURCE_ROOT}/unicode.cpp"
+    "${SOURCE_ROOT}/uconv.cpp"
     "${SOURCE_ROOT}/test.cpp")
 
 source_group("include" FILES ${HEADERS})
