@@ -128,7 +128,133 @@ void test_ascii_short()
     char8_t utf8_string[utf8_length+1] = {};
     size_t length2 = utf16_to_utf8(utf8_length, utf8_string, length, utf16_string);
     assert(0 == strcmp(reinterpret_cast<const char*>(utf8_ascii.c_str()), reinterpret_cast<const char*>(utf8_string)));
-    //std::cout << "ASCII test passed." << reinterpret_cast<const char*>(utf8_ascii_roundtrip.c_str()) << std::endl;
+}
+
+void test_japanese_short()
+{
+    std::u8string utf8_japanese = u8"こんにちは、世界！";
+
+    static constexpr size_t utf16_length = 32;
+    char16_t utf16_string[utf16_length+1] = {};
+
+    size_t length = utf8_to_utf16(utf16_length, utf16_string, utf8_japanese.length(), utf8_japanese.c_str());
+    static constexpr size_t utf8_length = 128;
+    char8_t utf8_string[utf8_length+1] = {};
+    size_t length2 = utf16_to_utf8(utf8_length, utf8_string, length, utf16_string);
+    assert(0 == strcmp(reinterpret_cast<const char*>(utf8_japanese.c_str()), reinterpret_cast<const char*>(utf8_string)));
+}
+
+void test_emoji_short()
+{
+    std::u8string utf8_emoji = u8"👋🌎";
+
+    static constexpr size_t utf16_length = 32;
+    char16_t utf16_string[utf16_length+1] = {};
+
+    size_t length = utf8_to_utf16(utf16_length, utf16_string, utf8_emoji.length(), utf8_emoji.c_str());
+    static constexpr size_t utf8_length = 128;
+    char8_t utf8_string[utf8_length+1] = {};
+    size_t length2 = utf16_to_utf8(utf8_length, utf8_string, length, utf16_string);
+    assert(0 == strcmp(reinterpret_cast<const char*>(utf8_emoji.c_str()), reinterpret_cast<const char*>(utf8_string)));
+}
+
+void test_empty_short()
+{
+    std::u8string utf8_empty = u8"";
+    static constexpr size_t utf16_length = 32;
+    char16_t utf16_string[utf16_length+1] = {};
+
+    size_t length = utf8_to_utf16(utf16_length, utf16_string, utf8_empty.length(), utf8_empty.c_str());
+    static constexpr size_t utf8_length = 128;
+    char8_t utf8_string[utf8_length+1] = {};
+    size_t length2 = utf16_to_utf8(utf8_length, utf8_string, length, utf16_string);
+    assert(0 == strcmp(reinterpret_cast<const char*>(utf8_empty.c_str()), reinterpret_cast<const char*>(utf8_string)));
+}
+
+void test_roundtrip_short()
+{
+    // UTF-8 -> UTF-16 -> UTF-8
+    std::u8string original_utf8 = u8"This is a test string: éàçüö";
+
+    static constexpr size_t utf16_length = 32;
+    char16_t utf16_string[utf16_length+1] = {};
+
+    size_t length = utf8_to_utf16(utf16_length, utf16_string, original_utf8.length(), original_utf8.c_str());
+    static constexpr size_t utf8_length = 128;
+    char8_t roundtrip_utf8[utf8_length+1] = {};
+    size_t length2 = utf16_to_utf8(utf8_length, roundtrip_utf8, length, utf16_string);
+    assert(0 == strcmp(reinterpret_cast<const char*>(original_utf8.c_str()), reinterpret_cast<const char*>(roundtrip_utf8)));
+    std::cout << "Roundtrip UTF-8 tests passed." << reinterpret_cast<const char*>(roundtrip_utf8) << std::endl;
+
+    // UTF-16 -> UTF-8 -> UTF-16
+    std::u16string original_utf16 = u"Another 𝄞 clef and symbols: €£¥";
+    char8_t converted_utf8[utf8_length+1] = {};
+    length = utf16_to_utf8(utf8_length, converted_utf8, original_utf16.length(), original_utf16.c_str());
+    char16_t roundtrip_utf16[utf16_length+1] = {};
+    length2 = utf8_to_utf16(utf16_length, roundtrip_utf16, utf8_length, converted_utf8);
+    assert(0 == strcmp(reinterpret_cast<const char*>(original_utf16.c_str()), reinterpret_cast<const char*>(roundtrip_utf16)));
+    std::cout << "Roundtrip UTF-16 tests passed." << reinterpret_cast<const char*>(roundtrip_utf16) << std::endl;
+}
+
+void test_surrogate_pairs_short()
+{
+    // U+1D11E is musical symbol G clef
+    // U+10400 is Deseret Long I
+    std::u8string utf8_surrogate = u8"𝄞𐐀"; // U+1D11E U+10400
+
+    static constexpr size_t utf16_length = 32;
+    char16_t utf16_surrogate[utf16_length+1] = {};
+
+    size_t length = utf8_to_utf16(utf16_length, utf16_surrogate, utf8_surrogate.length(), utf8_surrogate.c_str());
+    static constexpr size_t utf8_length = 128;
+    char8_t utf8_surrogate_roundtrip[utf8_length+1] = {};
+    size_t length2 = utf16_to_utf8(utf8_length, utf8_surrogate_roundtrip, length, utf16_surrogate);
+    assert(0 == strcmp(reinterpret_cast<const char*>(utf8_surrogate.c_str()), reinterpret_cast<const char*>(utf8_surrogate_roundtrip)));
+    std::cout << "Roundtrip UTF-8 tests passed." << reinterpret_cast<const char*>(utf8_surrogate_roundtrip) << std::endl;
+
+    std::u16string original_utf16_surrogate = u"𝄞𐐀";
+    char8_t converted_utf8_surrogate[utf8_length+1] = {};
+    length = utf16_to_utf8(utf8_length, converted_utf8_surrogate, original_utf16_surrogate.length(), original_utf16_surrogate.c_str());
+    char16_t roundtrip_utf16_surrogate[utf16_length] = {};
+    length2 = utf8_to_utf16(utf16_length, roundtrip_utf16_surrogate, utf8_length, converted_utf8_surrogate);
+    assert(original_utf16_surrogate == roundtrip_utf16_surrogate);
+
+    std::cout << "Surrogate pair test passed." << std::endl;
+}
+
+void test_malformed_sequences_short()
+{
+    static constexpr size_t utf8_length = 128;
+
+    // Test invalid UTF-16 (unpaired surrogates)
+    // A high surrogate without a following low surrogate
+    char16_t high_surrogate[] = {static_cast<char16_t>(0xD834), 0};
+    char8_t utf8_buffer_high[utf8_length] = {}; // Buffer for UTF-8 output
+
+    size_t utf8_length_high = utf16_to_utf8(sizeof(utf8_buffer_high), utf8_buffer_high, 1, high_surrogate);
+    std::u8string utf8_from_unpaired_high(reinterpret_cast<const char8_t*>(utf8_buffer_high));
+
+    // Common behavior is to replace with U+FFFD (EF BF BD in UTF-8)
+    std::u8string expected_utf8_high = u8"\xEF\xBF\xBD";
+    if (utf8_from_unpaired_high == expected_utf8_high) {
+        std::cout << "Malformed sequence test (unpaired high surrogate) passed." << std::endl;
+    } else {
+        std::cout << "Malformed sequence test (unpaired high surrogate) did not produce replacement character." << std::endl;
+    }
+
+    // A low surrogate without a preceding high surrogate
+    char16_t low_surrogate[] = {static_cast<char16_t>(0xDD1E), 0};
+    char8_t utf8_buffer_low[utf8_length] = {}; // Buffer for UTF-8 output
+
+    size_t utf8_length_low = utf16_to_utf8(sizeof(utf8_buffer_low), utf8_buffer_low, 1, low_surrogate);
+    std::u8string utf8_from_unpaired_low(reinterpret_cast<const char8_t*>(utf8_buffer_low));
+
+    std::u8string expected_utf8_low = u8"\xEF\xBF\xBD";
+    if (utf8_from_unpaired_low == expected_utf8_low) {
+        std::cout << "Malformed sequence test (unpaired low surrogate) passed." << std::endl;
+    } else {
+        std::cout << "Malformed sequence test (unpaired low surrogate) did not produce replacement character." << std::endl;
+    }
 }
 
 int main(void)
@@ -142,6 +268,12 @@ int main(void)
     test_malformed_sequences();
 
     test_ascii_short();
+    test_japanese_short();
+    test_emoji_short();
+    test_empty_short();
+    test_roundtrip_short();
+    test_surrogate_pairs_short();
+    test_malformed_sequences_short();
 
     std::cout << "All tests passed!" << std::endl;
 

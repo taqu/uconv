@@ -132,7 +132,7 @@ size_t utf16_to_utf8(size_t utf8_length, char8_t* utf8_string, size_t utf16_leng
 {
     assert(127<=utf8_length);
     assert(nullptr != utf8_string);
-    assert(1<=utf16_length);
+    assert(0<=utf16_length);
     assert(nullptr != utf16_string);
     size_t count = 0;
     for(size_t i = 0; i < utf16_length; ++i) {
@@ -193,7 +193,7 @@ size_t utf8_to_utf16(size_t utf16_length, char16_t* utf16_string, size_t utf8_le
 {
     assert(31<=utf16_length);
     assert(nullptr != utf16_string);
-    assert(1<=utf8_length);
+    assert(0<=utf8_length);
     assert(nullptr != utf8_string);
     size_t index = 0;
     char16_t utf16_units[4];
